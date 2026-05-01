@@ -94,6 +94,10 @@ namespace CajeroAutomatico.Operaciones
                 }
             }
         }
+     // Métodos públicos para llamar operaciones individuales desde Menu.cs
+        public void EjecutarSesion_Consulta(Usuario usuario) => OperacionConsultarSaldo(usuario);
+        public void EjecutarSesion_Deposito(Usuario usuario) => OperacionDepositar(usuario);
+        public void EjecutarSesion_Retiro(Usuario usuario)   => OperacionRetirar(usuario);
 
         // ══════════════════════════════════════════════════════
         //   OPERACIÓN 1: CONSULTAR SALDO
