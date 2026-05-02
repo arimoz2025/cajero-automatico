@@ -6,6 +6,7 @@
 // ============================================================
 
 using System;
+using System.IO;
 using System.Threading;
 using CajeroAutomatico.Logica;
 using CajeroAutomatico.Modelos;
@@ -159,7 +160,14 @@ namespace CajeroAutomatico.UI
         // Pantalla inicial del cajero (antes del login)
         private static void MostrarPantallaBienvenida()
         {
-            Console.Clear();
+            try
+            {
+                Console.Clear();
+            }
+            catch (IOException)
+            {
+                // Ignorar error de consola no válida
+            }
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine();
             Console.WriteLine("  ╔══════════════════════════════════════════════╗");

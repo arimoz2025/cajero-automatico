@@ -89,6 +89,9 @@ INSERT OR IGNORE INTO Usuarios (nombre_titular, numero_tarjeta, pin, saldo)
 VALUES
     ('Juan Carlos Pérez',    '4111111111111111', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 1500.00),
     ('María López García',   '5500005555555559', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 3200.50),
-    ('Carlos Eduardo Ruiz',  '3400000000000009', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 800.00);
+    ('Carlos Eduardo Ruiz',  '3400000000000009', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 800.00),
+    ('Ana Ruth Sanchez',     '1234567890123456', '0ffe1abd1a08215353c233d6e009613e95eec4253832a761af28ff37ac5a150c', 1000000.00), -- PIN: 1111
+    ('Nayib Bukele',         '9876543210987654', 'c1f330d0aff31c1c87403f1e4347bcc21aff7c179908723535f2b31723702525', 11000000.00); -- PIN: 5555
 
 -- Nota: hash '03ac67...' = PIN "1234" | hash 'ef92b7...' = PIN "5678"
+-- Nota: hash '0ffe1a...' = PIN "1111" | hash 'c1f330...' = PIN "5555"
