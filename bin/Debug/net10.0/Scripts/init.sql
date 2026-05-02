@@ -6,20 +6,39 @@
 PRAGMA foreign_keys = ON;
 
 -- ============================================================
--- TABLA: Usuarios
--- Almacena los titulares de las tarjetas
+-- TABLA: SesionesAuditoria
+-- Auditoría de intentos de acceso (correctos e incorrectos)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS Usuarios (
-    id_usuario      INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre_titular  TEXT    NOT NULL,
-    numero_tarjeta  TEXT    NOT NULL UNIQUE,
-    pin             TEXT    NOT NULL,          -- Guardado como hash SHA-256
-    saldo           REAL    NOT NULL DEFAULT 0.00,
-    intentos_fallidos INTEGER NOT NULL DEFAULT 0,
-    bloqueado       INTEGER NOT NULL DEFAULT 0, -- 0 = activo, 1 = bloqueado
-    fecha_creacion  TEXT    NOT NULL DEFAULT (datetime('now')),
-    fecha_actualizacion TEXT NOT NULL DEFAULT (datetime('now'))
+CREATE TABLE IF NOT EXISTS SesionesAuditoria (
+    id_sesion       INTEGER PRIMARY KEY AUTOINCREMENT,
+    numero_tarjeta  TEXT    NOT NULL,
+    exitosa         INTEGER NOT NULL DEFAULT 0, -- 1 = éxito, 0 = fallida
+    ip_origen       TEXT,
+    fecha           TEXT    NOT NULL DEFAULT (datetime('now'))
 );
+
+-- ============================================================
+-- TABLA: Transferencias
+-- Registro de transferencias entre cuentas
+-- ============================================================
+CREATE TABLE IF NOT EXISTS Transferencias (
+    id_transferencia  INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_usuario_origen INTEGER NOT NULL,
+    id_usuario_destino INTEGER NOT NULL,
+    monto             REAL    NOT NULL,
+    saldo_origen_antes REAL   NOT NULL,
+    saldo_origen_despues REAL NOT NULL,
+    saldo_destino_antes REAL NOT NULL,
+    saldo_destino_despues REAL NOT NULL,
+    descripcion       TEXT,
+    fecha             TEXT    NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (id_usuario_origen) REFERENCES Usuarios(id_usuario),
+    FOREIGN KEY (id_usuario_destino) REFERENCES Usuarios(id_usuario)
+);
+
+-- Índice para optimizar consultas de transferencias
+CREATE INDEX IF NOT EXISTS idx_transferencias_usuario ON Transferencias(id_usuario_origen);
+CREATE INDEX IF NOT EXISTS idx_transferencias_fecha ON Transferencias(fecha);
 
 -- ============================================================
 -- TABLA: Transacciones
@@ -39,16 +58,27 @@ CREATE TABLE IF NOT EXISTS Transacciones (
 );
 
 -- ============================================================
--- TABLA: SesionesAuditoria
--- Auditoría de intentos de acceso (correctos e incorrectos)
+-- TABLA: Transferencias
+-- Registro de transferencias entre cuentas
 -- ============================================================
-CREATE TABLE IF NOT EXISTS SesionesAuditoria (
-    id_sesion       INTEGER PRIMARY KEY AUTOINCREMENT,
-    numero_tarjeta  TEXT    NOT NULL,
-    exitosa         INTEGER NOT NULL DEFAULT 0, -- 1 = éxito, 0 = fallida
-    ip_origen       TEXT,
-    fecha           TEXT    NOT NULL DEFAULT (datetime('now'))
+CREATE TABLE IF NOT EXISTS Transferencias (
+    id_transferencia  INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_usuario_origen INTEGER NOT NULL,
+    id_usuario_destino INTEGER NOT NULL,
+    monto             REAL    NOT NULL,
+    saldo_origen_antes REAL   NOT NULL,
+    saldo_origen_despues REAL NOT NULL,
+    saldo_destino_antes REAL NOT NULL,
+    saldo_destino_despues REAL NOT NULL,
+    descripcion       TEXT,
+    fecha             TEXT    NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (id_usuario_origen) REFERENCES Usuarios(id_usuario),
+    FOREIGN KEY (id_usuario_destino) REFERENCES Usuarios(id_usuario)
 );
+
+-- Índice para optimizar consultas de transferencias
+CREATE INDEX IF NOT EXISTS idx_transferencias_usuario ON Transferencias(id_usuario_origen);
+CREATE INDEX IF NOT EXISTS idx_transferencias_fecha ON Transferencias(fecha);
 
 -- ============================================================
 -- ÍNDICES para optimizar consultas frecuentes

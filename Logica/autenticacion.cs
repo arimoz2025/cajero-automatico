@@ -292,10 +292,10 @@ namespace CajeroAutomatico.Logica
         private static void MostrarBanner()
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("  ╔══════════════════════════════════════════╗");
-            Console.WriteLine("  ║          BANCOSIM — CAJERO ATM           ║");
-            Console.WriteLine("  ║     Universidad Don Bosco  |  PAL404     ║");
-            Console.WriteLine("  ╚══════════════════════════════════════════╝");
+            Console.WriteLine("  ╔══════════════════════════════════════════════╗");
+            Console.WriteLine("  ║          BANCOSIM — CAJERO ATM               ║");
+            Console.WriteLine("  ║     Universidad Don Bosco  |  PAL404         ║");
+            Console.WriteLine("  ╚══════════════════════════════════════════════╝");
             Console.ResetColor();
             Console.WriteLine($"\n  {DateTime.Now:dddd, dd 'de' MMMM 'de' yyyy  HH:mm}\n");
         }
@@ -313,7 +313,7 @@ namespace CajeroAutomatico.Logica
         private static void MostrarCuentaBloqueada()
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("\n  ╔══════════════════════════════════════╗");
+            Console.WriteLine("\n╔══════════════════════════════════════╗");
             Console.WriteLine("  ║         CUENTA BLOQUEADA             ║");
             Console.WriteLine("  ╚══════════════════════════════════════╝");
             Console.ResetColor();

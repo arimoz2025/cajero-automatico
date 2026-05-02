@@ -94,10 +94,11 @@ namespace CajeroAutomatico.Operaciones
                 }
             }
         }
-     // Métodos públicos para llamar operaciones individuales desde Menu.cs
+        // Métodos públicos para llamar operaciones individuales desde Menu.cs
         public void EjecutarSesion_Consulta(Usuario usuario) => OperacionConsultarSaldo(usuario);
         public void EjecutarSesion_Deposito(Usuario usuario) => OperacionDepositar(usuario);
         public void EjecutarSesion_Retiro(Usuario usuario)   => OperacionRetirar(usuario);
+        public void EjecutarSesion_Transferencia(Usuario usuario) => OperacionTransferir(usuario);
 
         // ══════════════════════════════════════════════════════
         //   OPERACIÓN 1: CONSULTAR SALDO
@@ -537,7 +538,213 @@ namespace CajeroAutomatico.Operaciones
             Console.ResetColor();
         }
 
-        // Pausa el programa hasta que el usuario presione ENTER
+        // ══════════════════════════════════════════════════════
+        //   OPERACIÓN 4: TRANSFERIR DINERO
+        //
+        //   Permite al usuario transferir dinero a otra cuenta.
+        //   Flujo: pedir tarjeta destino → validar → pedir monto → validar → confirmar → guardar en BD
+        // ══════════════════════════════════════════════════════
+        private void OperacionTransferir(Usuario usuario)
+        {
+            LimpiarPantalla();
+            DibujarEncabezado("TRANSFERENCIA DE DINERO");
+
+            // Mostrar saldo actual antes de pedir datos
+            Console.WriteLine("  Saldo disponible: $ {0:F2}", usuario.Saldo);
+            Console.WriteLine();
+
+            // ── Paso 1: Pedir número de tarjeta destino ─────────────────────────
+            string tarjetaDestino = PedirTarjetaDestino();
+
+            if (string.IsNullOrEmpty(tarjetaDestino))
+            {
+                MensajeAdvertencia("Operación cancelada.");
+                Pausa();
+                return;
+            }
+
+            // Verificar que la tarjeta destino exista y no sea la misma que la de origen
+            if (tarjetaDestino == usuario.NumeroTarjeta)
+            {
+                MensajeError("No puede transferir dinero a su propia cuenta.");
+                Pausa();
+                return;
+            }
+
+            Usuario? usuarioDestino = _usuarioDAO.ObtenerPorTarjeta(tarjetaDestino);
+            if (usuarioDestino == null)
+            {
+                MensajeError("La tarjeta destino no existe en el sistema.");
+                Pausa();
+                return;
+            }
+
+            if (usuarioDestino.Bloqueado)
+            {
+                MensajeError("La cuenta destino está bloqueada.");
+                Pausa();
+                return;
+            }
+
+            // ── Paso 2: Pedir el monto ─────────────────────────
+            double monto = PedirMonto("  Ingrese el monto a transferir: $");
+
+            if (monto == -1) // Usuario canceló
+            {
+                MensajeAdvertencia("Operación cancelada.");
+                Pausa();
+                return;
+            }
+
+            // ── Paso 3: Validaciones ───────────────────────────
+
+            // El monto debe ser mayor a cero
+            if (monto <= 0)
+            {
+                MensajeError("El monto debe ser mayor a cero.");
+                Pausa();
+                return;
+            }
+
+            // No se permiten montos extremadamente grandes
+            if (monto > MONTO_MAXIMO_OPERACION)
+            {
+                MensajeError($"El monto máximo por operación es $ {MONTO_MAXIMO_OPERACION:F2}.");
+                Pausa();
+                return;
+            }
+
+            // Debe haber suficiente saldo en la cuenta
+            if (monto > usuario.Saldo)
+            {
+                MensajeError("Saldo insuficiente.");
+                Pausa();
+                return;
+            }
+
+            // ── Paso 4: Mostrar resumen y pedir confirmación ───
+            double nuevoSaldoOrigen = usuario.Saldo - monto;
+            double nuevoSaldoDestino = usuarioDestino.Saldo + monto;
+
+            Console.WriteLine();
+            Console.WriteLine("  ┌─────────────────────────────────┐");
+            Console.WriteLine("  │    CONFIRMAR TRANSFERENCIA      │");
+            Console.WriteLine("  │                                 │");
+            Console.WriteLine("  │  Monto a transferir: $ {0,-10:F2}│", monto);
+            Console.WriteLine("  │  Cuenta origen:      {0,-16}│", usuario.NumeroTarjeta);
+            Console.WriteLine("  │  Saldo actual:       $ {0,-10:F2}│", usuario.Saldo);
+            Console.WriteLine("  │  Saldo restante:     $ {0,-10:F2}│", nuevoSaldoOrigen);
+            Console.WriteLine("  │                                 │");
+            Console.WriteLine("  │  Cuenta destino:     {0,-16}│", usuarioDestino.NumeroTarjeta);
+            Console.WriteLine("  │  Titular:            {0,-16}│", usuarioDestino.NombreTitular.Length > 16 ? usuarioDestino.NombreTitular.Substring(0, 16) : usuarioDestino.NombreTitular);
+            Console.WriteLine("  │  Saldo destino:      $ {0,-10:F2}│", usuarioDestino.Saldo);
+            Console.WriteLine("  │  Nuevo saldo destino:$ {0,-10:F2}│", nuevoSaldoDestino);
+            Console.WriteLine("  └─────────────────────────────────┘");
+            Console.WriteLine();
+
+            // Preguntar S/N antes de hacer cualquier cambio
+            if (!PedirConfirmacion("  ¿Desea confirmar la transferencia? (S/N): "))
+            {
+                MensajeAdvertencia("Operación cancelada por el usuario.");
+                Pausa();
+                return;
+            }
+
+            // ── Paso 5: Guardar en la base de datos ────────────
+            var transferenciaDAO = new TransferenciaDAO();
+            bool exito = transferenciaDAO.RegistrarTransferencia(
+                idUsuarioOrigen: usuario.IdUsuario,
+                idUsuarioDestino: usuarioDestino.IdUsuario,
+                monto: monto,
+                saldoOrigenAntes: usuario.Saldo,
+                saldoOrigenDespues: nuevoSaldoOrigen,
+                saldoDestinoAntes: usuarioDestino.Saldo,
+                saldoDestinoDespues: nuevoSaldoDestino,
+                descripcion: $"Transferencia a {usuarioDestino.NumeroTarjeta}"
+            );
+
+            // ── Paso 6: Mostrar resultado ──────────────────────
+            if (exito)
+            {
+                // Actualizar el saldo en memoria para mostrarlo en el comprobante
+                usuario.Saldo = nuevoSaldoOrigen;
+                ImprimirComprobanteTransferencia(usuario, usuarioDestino, monto);
+                MensajeExito("¡Transferencia realizada exitosamente!");
+            }
+            else
+            {
+                // La BD rechazó la operación (error de conexión, etc.)
+                MensajeError("No se pudo completar la transferencia. Intente de nuevo.");
+            }
+
+            Pausa();
+        }
+
+        // ══════════════════════════════════════════════════════
+        //   MÉTODO AUXILIAR: PedirTarjetaDestino
+        //   Pide el número de tarjeta destino al usuario
+        // ══════════════════════════════════════════════════════
+        private static string PedirTarjetaDestino()
+        {
+            while (true)
+            {
+                Console.Write("  Ingrese el número de tarjeta destino (o '0' para cancelar): ");
+                string entrada = Console.ReadLine()?.Trim() ?? "";
+
+                // Si el usuario escribe 0, cancelar la operación
+                if (entrada == "0")
+                    return string.Empty;
+
+                // Validar que solo contenga dígitos
+                bool soloDigitos = true;
+                foreach (char c in entrada)
+                    if (!char.IsDigit(c)) { soloDigitos = false; break; }
+
+                if (!soloDigitos)
+                {
+                    MensajeError("El número de tarjeta solo debe contener dígitos.");
+                    continue;
+                }
+
+                // Validar longitud (16 dígitos típicamente)
+                if (entrada.Length != 16)
+                {
+                    MensajeError("El número de tarjeta debe tener 16 dígitos.");
+                    continue;
+                }
+
+                return entrada;
+            }
+        }
+
+        // ══════════════════════════════════════════════════════
+        //   COMPROBANTE DE TRANSFERENCIA
+        //   Se imprime al final de cada transferencia exitosa.
+        // ══════════════════════════════════════════════════════
+        private static void ImprimirComprobanteTransferencia(Usuario usuarioOrigen, Usuario usuarioDestino, double monto)
+        {
+            Console.WriteLine();
+            Console.WriteLine("  ╔══════════════════════════════════╗");
+            Console.WriteLine("  ║         COMPROBANTE              ║");
+            Console.WriteLine("  ╠══════════════════════════════════╣");
+            Console.WriteLine("  ║  Cajero Automático               ║");
+            Console.WriteLine("  ║  Fecha   : {0,-23}║", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"));
+            Console.WriteLine("  ║  Tarjeta : {0,-23}║", usuarioOrigen.NumeroTarjeta);
+            Console.WriteLine("  ╠══════════════════════════════════╣");
+            Console.WriteLine("  ║  Operación : TRANSFERENCIA       ║");
+            Console.WriteLine("  ║  Monto     : $ {0,-19:F2}║", monto);
+            Console.WriteLine("  ║  Saldo     : $ {0,-19:F2}║", usuarioOrigen.Saldo);
+            Console.WriteLine("  ║                                 ║");
+            Console.WriteLine("  ║  Destino   : {0,-23}║", usuarioDestino.NumeroTarjeta);
+            Console.WriteLine("  ║  Titular   : {0,-23}║", usuarioDestino.NombreTitular.Length > 23 ? usuarioDestino.NombreTitular.Substring(0, 23) : usuarioDestino.NombreTitular);
+            Console.WriteLine("  ╚══════════════════════════════════╝");
+            Console.WriteLine();
+        }
+
+        // ══════════════════════════════════════════════════════
+        //   MÉTODO DE APOYO: Pausa
+        //   Pausa el programa hasta que el usuario presione ENTER
+        // ══════════════════════════════════════════════════════
         private static void Pausa()
         {
             Console.WriteLine();

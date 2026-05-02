@@ -125,11 +125,16 @@ namespace CajeroAutomatico.UI
                         break;
 
                     case "5":
+                        // Transferir dinero
+                        operaciones.EjecutarSesion_Transferencia(usuarioActual);
+                        break;
+
+                    case "6":
                         // Cambiar PIN
                         Autenticacion.CambiarPIN(usuarioActual);
                         break;
 
-                    case "6":
+                    case "7":
                         // Cerrar sesión voluntariamente
                         sesionActiva = false;
                         DetenerTimer();
@@ -137,7 +142,7 @@ namespace CajeroAutomatico.UI
                         break;
 
                     default:
-                        MostrarError("Opción no válida. Ingrese un número del 1 al 6.");
+                        MostrarError("Opción no válida. Ingrese un número del 1 al 7.");
                         Pausa();
                         break;
                 }
@@ -172,19 +177,19 @@ namespace CajeroAutomatico.UI
             Console.WriteLine();
             Console.WriteLine("  ╔══════════════════════════════════════════════╗");
             Console.WriteLine("  ║                                              ║");
-            Console.WriteLine("  ║          B A N C O S I M   A T M            ║");
+            Console.WriteLine("  ║          B A N C O S I M   A T M             ║");
             Console.WriteLine("  ║                                              ║");
-            Console.WriteLine("  ║        Universidad Don Bosco                ║");
-            Console.WriteLine("  ║        PAL404 — Programación de Algoritmos  ║");
+            Console.WriteLine("  ║        Universidad Don Bosco                 ║");
+            Console.WriteLine("  ║        PAL404 — Programación de Algoritmos   ║");
             Console.WriteLine("  ║                                              ║");
             Console.WriteLine("  ╠══════════════════════════════════════════════╣");
             Console.ResetColor();
             Console.WriteLine("  ║                                              ║");
-            Console.WriteLine($"  ║   {DateTime.Now:dddd, dd 'de' MMMM 'de' yyyy}          ║");
-            Console.WriteLine($"  ║   Hora: {DateTime.Now:HH:mm:ss}                             ║");
+            Console.WriteLine($" ║ {DateTime.Now:dddd, dd 'de' MMMM 'de' yyyy}  ║");
+            Console.WriteLine($" ║   Hora: {DateTime.Now:HH:mm:ss}              ║");
             Console.WriteLine("  ║                                              ║");
-            Console.WriteLine("  ║   Por favor inserte su tarjeta              ║");
-            Console.WriteLine("  ║   y presione ENTER para continuar.          ║");
+            Console.WriteLine("  ║   Por favor inserte su tarjeta               ║");
+            Console.WriteLine("  ║   y presione ENTER para continuar.           ║");
             Console.WriteLine("  ║                                              ║");
             Console.WriteLine("  ╚══════════════════════════════════════════════╝");
             Console.WriteLine();
@@ -199,7 +204,7 @@ namespace CajeroAutomatico.UI
             // Encabezado con datos del titular
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("  ╔══════════════════════════════════════════════╗");
-            Console.WriteLine("  ║           CAJERO AUTOMÁTICO — MENÚ          ║");
+            Console.WriteLine("  ║           CAJERO AUTOMÁTICO — MENÚ           ║");
             Console.WriteLine("  ╠══════════════════════════════════════════════╣");
             Console.ResetColor();
 
@@ -212,15 +217,6 @@ namespace CajeroAutomatico.UI
             // Mostrar solo los últimos 4 dígitos de la tarjeta
             string tarjetaOculta = $"**** **** **** {usuario.NumeroTarjeta[^4..]}";
             Console.WriteLine($"  ║  Tarjeta : {tarjetaOculta,-34}║");
-
-            // Mostrar saldo en verde
-            Console.Write("  ║  Saldo   : ");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write($"$ {usuario.Saldo:F2}");
-            Console.ResetColor();
-            // Padding dinámico para que el marco cierre correctamente
-            int saldoLen = $"$ {usuario.Saldo:F2}".Length;
-            Console.WriteLine(new string(' ', 34 - saldoLen) + "║");
 
             // Tiempo restante de sesión
             int segundosRestantes = SEGUNDOS_INACTIVIDAD -
@@ -237,12 +233,13 @@ namespace CajeroAutomatico.UI
 
             // Opciones del menú
             Console.WriteLine("  ║                                              ║");
-            Console.WriteLine("  ║   [1]  Consultar saldo                      ║");
-            Console.WriteLine("  ║   [2]  Depositar dinero                     ║");
-            Console.WriteLine("  ║   [3]  Retirar efectivo                     ║");
-            Console.WriteLine("  ║   [4]  Ver historial de operaciones         ║");
-            Console.WriteLine("  ║   [5]  Cambiar PIN                          ║");
-            Console.WriteLine("  ║   [6]  Finalizar sesión                     ║");
+            Console.WriteLine("  ║   [1]  Consultar saldo                       ║");
+            Console.WriteLine("  ║   [2]  Depositar dinero                      ║");
+            Console.WriteLine("  ║   [3]  Retirar efectivo                      ║");
+            Console.WriteLine("  ║   [4]  Ver historial de operaciones          ║");
+            Console.WriteLine("  ║   [5]  Transferir dinero                     ║");
+            Console.WriteLine("  ║   [6]  Cambiar PIN                           ║");
+            Console.WriteLine("  ║   [7]  Finalizar sesión                      ║");
             Console.WriteLine("  ║                                              ║");
             Console.WriteLine("  ╚══════════════════════════════════════════════╝");
             Console.WriteLine();
@@ -256,12 +253,12 @@ namespace CajeroAutomatico.UI
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("  ╔══════════════════════════════════════════════╗");
-            Console.WriteLine("  ║          SESIÓN CERRADA POR INACTIVIDAD     ║");
+            Console.WriteLine("  ║          SESIÓN CERRADA POR INACTIVIDAD      ║");
             Console.WriteLine("  ╠══════════════════════════════════════════════╣");
             Console.ResetColor();
-            Console.WriteLine($"  ║  Su sesión ha sido cerrada por seguridad.  ║");
-            Console.WriteLine($"  ║                                              ║");
-            Console.WriteLine($"  ║  Por favor, retire su tarjeta.              ║");
+            Console.WriteLine($" ║  Su sesión ha sido cerrada por seguridad.    ║");
+            Console.WriteLine($" ║                                              ║");
+            Console.WriteLine($" ║  Por favor, retire su tarjeta.               ║");
             Console.WriteLine("  ╚══════════════════════════════════════════════╝");
             Console.WriteLine();
             Console.WriteLine($"  Hasta pronto, {nombre}.");
