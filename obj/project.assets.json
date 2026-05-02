@@ -289,19 +289,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Roberto\\.nuget\\packages\\": {}
+    "C:\\Users\\Acer\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Roberto\\Documents\\GitHub\\cajero-automatico\\CajeroAutomatico.csproj",
+      "projectUniqueName": "C:\\Users\\Acer\\Desktop\\cajero-automatico\\CajeroAutomatico.csproj",
       "projectName": "CajeroAutomatico",
-      "projectPath": "C:\\Users\\Roberto\\Documents\\GitHub\\cajero-automatico\\CajeroAutomatico.csproj",
-      "packagesPath": "C:\\Users\\Roberto\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Roberto\\Documents\\GitHub\\cajero-automatico\\obj\\",
+      "projectPath": "C:\\Users\\Acer\\Desktop\\cajero-automatico\\CajeroAutomatico.csproj",
+      "packagesPath": "C:\\Users\\Acer\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Acer\\Desktop\\cajero-automatico\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Roberto\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Acer\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
