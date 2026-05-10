@@ -1,9 +1,8 @@
-// ============================================================
+
 //  UI/menu.cs
 //  Interfaz principal de consola del cajero automático.
 //  Conecta todos los módulos: Autenticacion, Operaciones,
 //  Historial y CambiarPIN en un flujo completo de sesión.
-// ============================================================
 
 using System;
 using System.IO;
@@ -28,10 +27,8 @@ namespace CajeroAutomatico.UI
         // ── Timer de inactividad ──
         private static Timer? _timerInactividad;
 
-        // ════════════════════════════════════════════════════════
         //   PUNTO DE ENTRADA PRINCIPAL
         //   Program.cs llama a este método al iniciar.
-        // ════════════════════════════════════════════════════════
         public static void Iniciar()
         {
             while (true)
