@@ -10,11 +10,10 @@ namespace CajeroAutomatico.Logica
         private const int MAX_INTENTOS = 3;
         private const int LARGO_PIN    = 4;
 
-        // ----------------------------------------------------------------
+        
         // IniciarSesion()
-        // Método público que tus compañeros llaman desde el menú.
+       
         // Devuelve el Usuario si el login fue exitoso, o null si falló.
-        // ----------------------------------------------------------------
         public static Usuario? IniciarSesion()
         {
             try
@@ -31,7 +30,7 @@ namespace CajeroAutomatico.Logica
             string tarjeta = PedirTarjeta();
 
             // Paso 2 — Verificar que la tarjeta existe y no está bloqueada
-            //          antes de pedir el PIN (evita exponer intentos innecesarios)
+            //          antes de pedir el PIN 
             var dao = new UsuarioDAO();
             var preview = dao.ObtenerPorTarjeta(tarjeta);
 
@@ -100,11 +99,10 @@ namespace CajeroAutomatico.Logica
             return null;
         }
 
-        // ----------------------------------------------------------------
+        
         // CambiarPIN(usuario)
-        // Tus compañeros lo llaman desde el menú cuando el usuario
         // elige la opción "Cambiar PIN".
-        // ----------------------------------------------------------------
+       
         public static void CambiarPIN(Usuario usuario)
         {
             Console.Clear();
@@ -170,10 +168,9 @@ namespace CajeroAutomatico.Logica
             Pausa();
         }
 
-        // ----------------------------------------------------------------
+       
         // CerrarSesion(usuario)
-        // Tus compañeros lo llaman cuando el usuario elige "Salir".
-        // ----------------------------------------------------------------
+    
         public static void CerrarSesion(Usuario usuario)
         {
             Console.Clear();
@@ -188,9 +185,9 @@ namespace CajeroAutomatico.Logica
             Console.Clear();
         }
 
-        // ================================================================
-        // MÉTODOS PRIVADOS — solo los usa este archivo
-        // ================================================================
+        
+        // MÉTODOS PRIVADOS  
+        
 
         // Pide el número de tarjeta con validaciones básicas
         private static string PedirTarjeta()
