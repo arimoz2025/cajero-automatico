@@ -58,7 +58,18 @@ namespace CajeroAutomatico.Base_de_Datos
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
+            // Desbloquear cuentas que hayan quedado bloqueadas por intentos fallidos
+            using var cmdDesbloquear = conexion.CreateCommand();
+            cmdDesbloquear.CommandText = @"
+                UPDATE Usuarios
+                SET bloqueado = 0,
+                    intentos_fallidos = 0
+                WHERE bloqueado = 1;";
+            int cuentasDesbloqueadas = cmdDesbloquear.ExecuteNonQuery();
+
             Console.WriteLine("[DB] Base de datos inicializada correctamente.");
+            if (cuentasDesbloqueadas > 0)
+                Console.WriteLine($"[DB] Cuentas desbloqueadas al iniciar: {cuentasDesbloqueadas}");
         }
 
         /// <summary>
